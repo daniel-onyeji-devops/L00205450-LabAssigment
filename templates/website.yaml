@@ -1,35 +1,53 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: CloudFormation static website for L00205450
+Description: CloudFormation static website assignment - Daniel Onyeji L00205450
 
 Resources:
   # Create an S3 bucket to store the website files
   WebsiteBucket:
     Type: AWS::S3::Bucket
-
     Properties:
-      # Keep the bucket private for security
+
+      # Keep public ACLs blocked, but allow a public read policy
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         IgnorePublicAcls: true
-        BlockPublicPolicy: true
-        RestrictPublicBuckets: true
+        BlockPublicPolicy: false
+        RestrictPublicBuckets: false
 
-      # Enable S3 static website configuration
+      # Configure the website homepage and error page
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: error.html
 
-      # Enable versioning to protect against accidental changes
+      # Keep previous file versions when files are updated
       VersioningConfiguration:
         Status: Enabled
 
+  # Allow visitors to read only the two website pages
+  WebsiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref WebsiteBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: PublicReadWebsiteFiles
+            Effect: Allow
+            Principal: '*'
+            Action: s3:GetObject
+            Resource:
+              - !Sub '${WebsiteBucket.Arn}/index.html'
+              - !Sub '${WebsiteBucket.Arn}/error.html'
+
 Outputs:
-  # Display the S3 bucket name after deployment
+  # Display the bucket name after deployment
   WebsiteBucketName:
     Description: Name of the website storage bucket
     Value: !Ref WebsiteBucket
 
-
-    
+  # Display the public website address
+  WebsiteURL:
+    Description: Public S3 website address
+    Value: !GetAtt WebsiteBucket.WebsiteURL
