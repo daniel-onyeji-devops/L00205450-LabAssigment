@@ -1,0 +1,35 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: CloudFormation static website for L00205450
+
+Resources:
+  # Create an S3 bucket to store the website files
+  WebsiteBucket:
+    Type: AWS::S3::Bucket
+
+    Properties:
+      # Keep the bucket private for security
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        RestrictPublicBuckets: true
+
+      # Enable S3 static website configuration
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
+
+      # Enable versioning to protect against accidental changes
+      VersioningConfiguration:
+        Status: Enabled
+
+Outputs:
+  # Display the S3 bucket name after deployment
+  WebsiteBucketName:
+    Description: Name of the website storage bucket
+    Value: !Ref WebsiteBucket
+
+
+    
